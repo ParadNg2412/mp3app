@@ -31,3 +31,18 @@ body {
     text-wrap: balance;
   }
 }
+
+.controls button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+  padding-left: 10px;
+}
+
+.process-bar input[type="range"] {
+  flex-grow: 0.2;
+  margin: 0 5px;
+}
