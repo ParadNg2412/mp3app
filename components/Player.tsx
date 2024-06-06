@@ -4,17 +4,19 @@ import { FaPlay, FaPause, FaForward, FaBackward} from "react-icons/fa";
 
 interface Song {
     id: number;
-    title: String;
-    artist: String;
+    title: string;
+    artist: string;
     src: string;
 }
 
 interface PlayerProps {
     Songs: Song[];
+    currentSongIndex: number;
+    setCurrentSongIndex: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Player: React.FC<PlayerProps> = ({ Songs }) => {
-    const [currentSongIndex, setCurrentSOngIndex] = useState(0);
+const Player: React.FC<PlayerProps> = ({ Songs, currentSongIndex, setCurrentSongIndex }) => {
+    //const [currentSongIndex, setCurrentSOngIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef<HTMLAudioElement>(null);
     const [currentTime, setCurrentTime] = useState(0);
@@ -25,6 +27,9 @@ const Player: React.FC<PlayerProps> = ({ Songs }) => {
             audioRef.current.src = Songs[currentSongIndex]?.src || '';
             if(isPlaying){
                 audioRef.current.play();
+            }
+            else {
+                audioRef.current.pause();
             }
         }
     }, [currentSongIndex, Songs, isPlaying]);
@@ -45,7 +50,7 @@ const Player: React.FC<PlayerProps> = ({ Songs }) => {
                 audio.removeEventListener('timeupdate', setAudioTime);
             };
         }
-    }, [isPlaying])
+    }, [])
 
     //Chạy & dừng
     function playPause() {
@@ -60,13 +65,13 @@ const Player: React.FC<PlayerProps> = ({ Songs }) => {
 
     //Đổi sang bài tiếp theo
     function playNext() {
-        setCurrentSOngIndex((prevIndex) => (prevIndex + 1) % Songs.length);
+        setCurrentSongIndex((prevIndex) => (prevIndex + 1) % Songs.length);
         setIsPlaying(true);
     }
 
     //Đổi sang bài trước
     function playPrevious() {
-        setCurrentSOngIndex((prevIndex) => prevIndex === 0 ? Songs.length - 1 : prevIndex - 1);
+        setCurrentSongIndex((prevIndex) => prevIndex === 0 ? Songs.length - 1 : prevIndex - 1);
         setIsPlaying(true);
     }
 
@@ -86,14 +91,14 @@ const Player: React.FC<PlayerProps> = ({ Songs }) => {
 
     return (
         <div className="player py-4">
-            <h2 className="font-bold">{Songs[currentSongIndex].title}</h2>
-            <h3>{Songs[currentSongIndex].artist}</h3>
+            <h2 className="font-bold">{Songs[currentSongIndex]?.title}</h2>
+            <h3>{Songs[currentSongIndex]?.artist}</h3>
             <audio ref={audioRef}
                     src={Songs[currentSongIndex].src}
                     onEnded={()=>playNext()}/>
             <div className="process-bar flex item-center gap-2">
                 <span>{formatTime(currentTime)}</span>
-                    <input type="range" value={currentTime} max={duration} onChange={seek}/>
+                    <input type="range" value={currentTime} max={duration} onChange={seek} className="flex-grow"/>
                 <span>{formatTime(duration)}</span>
             </div>
             
