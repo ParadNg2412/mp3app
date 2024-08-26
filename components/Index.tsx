@@ -1,5 +1,5 @@
 'use client'
-import { use, useState } from "react";
+import { use, useRef, useState } from "react";
 import Player from "@/components/Player";
 import SongManager from "./SongManager";
 
@@ -13,12 +13,14 @@ export default function MusicApp({}: Props) {
     ]);
 
     const [currentSongIndex, setCurrentSongIndex] = useState(0);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef<HTMLAudioElement>(null);
 
     return (
       <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold">My Music App</h1>
-        <Player Songs={songs} currentSongIndex={currentSongIndex} setCurrentSongIndex={setCurrentSongIndex}/>
-        <SongManager songs={songs} setSongs={setSongs} setCurrentSongIndex={setCurrentSongIndex}/>
+        <Player Songs={songs} currentSongIndex={currentSongIndex} setCurrentSongIndex={setCurrentSongIndex} isPlaying={isPlaying} setIsPlaying={setIsPlaying} audioRef={audioRef}/>
+        <SongManager songs={songs} setSongs={setSongs} currentSongIndex={currentSongIndex} setCurrentSongIndex={setCurrentSongIndex} isPlaying={isPlaying} setIsPlaying={setIsPlaying} audioRef={audioRef}/>
       </div>
     );
 }

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { FaPause, FaPlay } from "react-icons/fa";
 import { FaTrashCan } from "react-icons/fa6";
 
 interface Song {
@@ -11,11 +12,15 @@ interface Song {
 interface SongManagerProps {
     songs: Song[];
     setSongs: React.Dispatch<React.SetStateAction<Song[]>>;
+    currentSongIndex: number;
     setCurrentSongIndex: React.Dispatch<React.SetStateAction<number>>;
+    isPlaying: boolean;
+    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+    audioRef: React.RefObject<HTMLAudioElement>;
 }
 
-const SongManager: React.FC<SongManagerProps> = ({songs, setSongs, setCurrentSongIndex}) => {
-    const [newSong, setNewSong] = useState<{title: string; artist: string; file: File | null}>({title: '', artist: '', file: null});
+const SongManager: React.FC<SongManagerProps> = ({songs, setSongs, currentSongIndex, setCurrentSongIndex, isPlaying, setIsPlaying, audioRef,}) => {
+    const [newSong, setNewSong] = useState<{id?: string, title: string; artist: string; file: File | null}>({title: '', artist: '', file: null});
 
     const input = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -34,6 +39,7 @@ const SongManager: React.FC<SongManagerProps> = ({songs, setSongs, setCurrentSon
             const songSrc = URL.createObjectURL(newSong.file);
             setSongs([...songs, {id: songId, title: newSong.title, artist: newSong.artist, src: songSrc}]);
             setNewSong({title: '', artist: '', file: null});
+            
         }
     }
 
@@ -50,7 +56,17 @@ const SongManager: React.FC<SongManagerProps> = ({songs, setSongs, setCurrentSon
     }
 
     function playSong (index: number){
-        setCurrentSongIndex(index);
+        if(audioRef.current){
+            if(index === currentSongIndex){
+                audioRef.current.currentTime = 0;
+                audioRef.current.play()
+                setIsPlaying(true);
+            }
+            else{
+                setCurrentSongIndex(index);
+                setIsPlaying(true);
+            }
+        }
     }
 
     return (
@@ -64,15 +80,19 @@ const SongManager: React.FC<SongManagerProps> = ({songs, setSongs, setCurrentSon
             </div>
             <ul className="song-list mt-4">
                 {songs.map((song, index) => (
-                    <li key={song.id} className="flex justify-between item-center p-2 border-b">
-                        <span onClick={() => playSong(index)} className="cursor-pointer">
-                            <h2 className="font-bold">{song.title}</h2>
-                            <a>{song.artist}</a>
-                        </span>
-                        <div>
-                            {/* <button onClick={() => editSong(song.id)} className="bg-yellow-500 text-white p-1 mr-2">Edit</button> */}
-                            <button onClick={() => deleteSong(song.id)} className="bg-red-500 text-white p-1 mr-2"><FaTrashCan size={15}/></button>
-                        </div>                        
+                    <li key={song.id} className="flex justify-between items-center p-2S border-b">
+                        <div className="flex items-center">
+                            <button onKeyDown={(e) => e.key === 'space'} onClick={() => playSong(index)} className="mr-2">{isPlaying && index === songs.findIndex(s => s.src === audioRef.current?.src) ? (<FaPause size={15}/>) : (<FaPlay size={15}/>)}</button>
+                            <span className="cursor-pointer pl-3">
+                                <h2 className="font-bold">{song.title}</h2>
+                                <a>{song.artist}</a>
+                            </span>
+                            <div className="pl-96">
+                                {/* <button onClick={() => editSong(song.id)} className="bg-yellow-500 text-white p-1 mr-2">Edit</button> */}
+                                <button onClick={() => deleteSong(song.id)} className="bg-red-500 text-white p-1 mr-2"><FaTrashCan size={15}/></button>
+                            </div>
+                        </div>
+                                                
                     </li>
                 ))}
             </ul>
