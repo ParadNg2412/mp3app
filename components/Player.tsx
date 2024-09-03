@@ -7,6 +7,7 @@ interface Song {
     title: string;
     artist: string;
     src: string;
+    isFavorite: boolean;
 }
 
 interface PlayerProps {
